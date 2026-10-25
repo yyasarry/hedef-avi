@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1020">
+  <title>Hedef Avı</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ═════════ EKRAN 1: MENÜ ═════════ -->
+  <section id="screen-menu" class="screen active" data-screen="menu">
+    <div class="center-box">
+      <div class="logo">🎯</div>
+      <h1>Hedef Avı</h1>
+      <p class="subtitle">Kameraya geç, hedeflere vur!</p>
+      <button class="btn btn-primary btn-xl" data-goto="players">Başlat</button>
+      <button class="btn btn-ghost" data-goto="settings">⚙ Ayarlar</button>
+    </div>
+  </section>
+
+  <!-- ═════════ AYARLAR (menüden açılır) ═════════ -->
+  <section id="screen-settings" class="screen" data-screen="settings">
+    <div class="center-box">
+      <h2>Ayarlar</h2>
+
+      <div class="setting">
+        <label>Zorluk</label>
+        <div class="segmented">
+          <button class="seg" data-diff="easy">Kolay</button>
+          <button class="seg" data-diff="normal">Normal</button>
+          <button class="seg" data-diff="hard">Zor</button>
+        </div>
+        <small id="diff-desc"></small>
+      </div>
+
+      <div class="setting">
+        <label for="range-volume">Ses: <span id="volume-val">50</span>%</label>
+        <input type="range" id="range-volume" min="0" max="100" step="5" value="50">
+      </div>
+
+      <div class="setting setting-row">
+        <label for="chk-fps">FPS göstergesi (hata ayıklama)</label>
+        <input type="checkbox" id="chk-fps">
+      </div>
+
+      <button class="btn btn-primary" data-goto="menu">Tamam</button>
+    </div>
+  </section>
+
+  <!-- ═════════ EKRAN 2: OYUNCU SEÇİMİ ═════════ -->
+  <section id="screen-players" class="screen" data-screen="players">
+    <div class="center-box">
+      <h2>Kaç kişi oynayacak?</h2>
+      <div class="player-choices">
+        <!-- data-players: seçilen oyuncu sayısı. Tıklanınca kalibrasyona geçer. -->
+        <button class="btn choice" data-players="1">1<small>Tek kişi</small></button>
+        <button class="btn choice" data-players="2">2<small>İki kişi</small></button>
+        <button class="btn choice" data-players="3">3<small>Üç kişi</small></button>
+      </div>
+      <button class="btn btn-ghost" data-goto="menu">← Geri</button>
+    </div>
+  </section>
+
+  <!-- ═════════ EKRAN 3: KALİBRASYON ═════════ -->
+  <section id="screen-calibration" class="screen" data-screen="calibration">
+    <div class="top-bar">Herkes kameraya tam görünsün</div>
+
+    <!-- Kamera + overlay canvas'ı burada başlar; oyun ekranına geçince oraya taşınır -->
+    <div id="slot-calibration" class="stage-slot">
+      <canvas id="stage"></canvas>
+      <div id="cam-info" class="cam-info"></div>
+      <!-- MediaPipe durumu + bilek koordinatları (pose.js doldurur) -->
+      <div id="pose-info" class="pose-info"></div>
+
+      <!-- Kamera izni / hata mesajı katmanı -->
+      <div id="cam-status" class="cam-status">
+        <p id="cam-status-text">Kamera izni isteniyor…</p>
+        <button id="btn-cam-retry" class="btn btn-primary" hidden>Tekrar Dene</button>
+      </div>
+    </div>
+
+    <div class="bottom-bar">
+      <button class="btn btn-ghost" data-goto="players">← Geri</button>
+      <button id="btn-flip" class="btn btn-ghost">🔄 Kamera</button>
+      <button id="btn-start" class="btn btn-primary" disabled>Başla</button>
+    </div>
+  </section>
+
+  <!-- ═════════ EKRAN 4: OYUN ═════════ -->
+  <section id="screen-game" class="screen" data-screen="game">
+    <!-- Skor panelleri main.js tarafından oyuncu sayısına göre doldurulur -->
+    <div id="score-bar" class="score-bar"></div>
+
+    <div id="slot-game" class="stage-slot">
+      <div id="timer" class="timer">30</div>
+      <!-- 3-2-1 geri sayımı ve "Başla!" yazısı (game.js doldurur) -->
+      <div id="countdown" class="countdown"></div>
+    </div>
+
+    <div class="bottom-bar">
+      <button class="btn btn-ghost" data-goto="menu">✕ Çık</button>
+    </div>
+  </section>
+
+  <!-- ═════════ EKRAN 5: SONUÇ ═════════ -->
+  <section id="screen-result" class="screen" data-screen="result">
+    <div class="center-box">
+      <h2>Sonuç</h2>
+      <div id="winner-banner" class="winner-banner">🏆 Sonuçlar burada görünecek</div>
+      <div id="result-table" class="result-table"></div>
+      <div class="row">
+        <button id="btn-again" class="btn btn-primary">Tekrar Oyna</button>
+        <button class="btn btn-ghost" data-goto="menu">Menüye Dön</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FPS / analiz hızı rozeti (Ayarlar'dan açılır; main.js doldurur) -->
+  <div id="fps-badge" class="fps-badge" hidden></div>
+
+</div>
+
+<!-- Kamera akışını alan gizli video elemanı; görüntü canvas'a çizilir -->
+<video id="video" playsinline muted autoplay></video>
+
+<!-- İSTEĞE BAĞLI: Telefonda konsolu (console.log) görmek için bu 2 satırın yorumunu kaldır.
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>eruda.init();</script>
+-->
+
+<!-- Klasik script'ler (module değil). Sıra önemli: önce pose.js, en son main.js -->
+<script src="pose.js"></script>
+<script src="game.js"></script>
+<script src="main.js"></script>
+</body>
+</html>

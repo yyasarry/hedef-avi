@@ -1,0 +1,338 @@
+/* ═══════════ Temel ═══════════ */
+:root {
+  --bg: #0b1020;
+  --panel: #151c33;
+  --panel-2: #1f2847;
+  --text: #eef2ff;
+  --muted: #9aa6cf;
+  --accent: #ffb703;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+#app {
+  position: fixed;
+  inset: 0;
+}
+
+/* Gizli video: sadece kaynak, ekranda görünmez */
+#video {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ═══════════ Ekranlar ═══════════ */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+           env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+.screen.active { display: flex; }
+
+.center-box {
+  margin: auto;
+  width: 100%;
+  max-width: 520px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  text-align: center;
+}
+
+h1 { font-size: 44px; margin: 0; letter-spacing: 1px; }
+h2 { font-size: 26px; margin: 0; }
+.logo { font-size: 72px; line-height: 1; }
+.subtitle { margin: 0; color: var(--muted); font-size: 17px; }
+
+/* ═══════════ Butonlar ═══════════ */
+.btn {
+  min-height: 52px;
+  padding: 12px 22px;
+  border: none;
+  border-radius: 14px;
+  background: var(--panel-2);
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.4; pointer-events: none; }
+.btn-primary { background: var(--accent); color: #1a1200; }
+.btn-ghost { background: transparent; border: 2px solid var(--panel-2); }
+.btn-xl { font-size: 24px; padding: 18px 48px; min-height: 64px; }
+
+.row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+/* ═══════════ Oyuncu seçimi ═══════════ */
+.player-choices {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  width: 100%;
+}
+.choice {
+  flex: 1;
+  max-width: 130px;
+  aspect-ratio: 1;
+  font-size: 52px;
+  font-weight: 800;
+  background: var(--panel);
+  border: 2px solid var(--panel-2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px;
+}
+.choice small { font-size: 13px; font-weight: 500; color: var(--muted); }
+
+/* ═══════════ Ayarlar ═══════════ */
+.setting {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  text-align: left;
+  background: var(--panel);
+  border-radius: 14px;
+}
+.setting label { font-weight: 700; font-size: 17px; }
+.setting small { color: var(--muted); min-height: 1.2em; }
+.setting-row { flex-direction: row; align-items: center; justify-content: space-between; }
+.setting input[type="range"] { width: 100%; height: 32px; accent-color: var(--accent); }
+.setting input[type="checkbox"] { width: 26px; height: 26px; accent-color: var(--accent); }
+
+.segmented { display: flex; gap: 6px; }
+.seg {
+  flex: 1;
+  min-height: 46px;
+  border-radius: 12px;
+  border: 2px solid var(--panel-2);
+  background: transparent;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  touch-action: manipulation;
+}
+.seg.active { background: var(--accent); border-color: var(--accent); color: #1a1200; }
+
+/* FPS rozeti: sağ altta, alt çubuğun hemen üstünde */
+.fps-badge {
+  position: fixed;
+  right: 6px;
+  bottom: calc(env(safe-area-inset-bottom) + 80px);
+  z-index: 20;
+  padding: 3px 7px;
+  font-size: 11px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: 6px;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+.fps-badge[hidden] { display: none; }
+
+/* ═══════════ Üst / alt çubuk ═══════════ */
+.top-bar {
+  padding: 10px 14px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 17px;
+  background: var(--panel);
+}
+.bottom-bar {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: var(--panel);
+}
+.bottom-bar .btn { flex: 1; font-size: 16px; padding: 10px 12px; }
+
+/* ═══════════ Kamera sahnesi ═══════════ */
+.stage-slot {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  background: #000;
+  overflow: hidden;
+}
+#stage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;   /* görüntü bozulmadan sığar */
+}
+
+.cam-status {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px;
+  text-align: center;
+  background: rgba(11, 16, 32, 0.88);
+  font-size: 17px;
+  line-height: 1.5;
+}
+.cam-status p { margin: 0; max-width: 420px; }
+.cam-status.hidden { display: none; }
+
+/* MediaPipe durum / bilek koordinatı yazısı (sol üst) */
+.pose-info {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  z-index: 3;
+  max-width: calc(100% - 16px);
+  padding: 4px 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #fff;
+  white-space: pre-line;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 8px;
+  pointer-events: none;
+}
+.pose-info:empty { display: none; }
+
+.cam-info {
+  position: absolute;
+  left: 8px;
+  bottom: 6px;
+  z-index: 3;
+  font-size: 11px;
+  color: #fff;
+  opacity: 0.7;
+  text-shadow: 0 1px 2px #000;
+  pointer-events: none;
+}
+
+/* ═══════════ Oyun ekranı ═══════════ */
+.score-bar {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: var(--panel);
+}
+.score-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--panel-2);
+  border-left: 6px solid var(--c, #fff);
+  border-radius: 12px;
+}
+.score-panel .name { font-size: 14px; color: var(--muted); }
+.score-panel .score { font-size: 30px; font-weight: 800; }
+
+.timer {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  z-index: 3;
+  padding: 2px 14px;
+  font-size: 34px;
+  font-weight: 800;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 12px;
+  pointer-events: none;
+}
+
+.timer.low { color: #ff5a5a; }
+
+/* 3-2-1 geri sayımı */
+.countdown {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: min(38vw, 38vh);
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+.countdown:empty { display: none; }
+.countdown.word { font-size: min(16vw, 16vh); }
+.countdown.tick { animation: tick 0.6s ease-out; }
+@keyframes tick {
+  from { transform: scale(1.6); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+/* Vuruşta skor paneli zıplar */
+.score-panel.bump { animation: bump 0.25s ease-out; }
+@keyframes bump {
+  50% { transform: scale(1.08); background: #27643f; }
+}
+
+/* ═══════════ Sonuç ═══════════ */
+.winner-banner {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--accent);
+}
+.winner-banner.pop { animation: pop 0.7s cubic-bezier(0.2, 1.6, 0.4, 1); }
+@keyframes pop {
+  from { transform: scale(0.3); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+.result-table {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.result-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--panel);
+  border-left: 6px solid var(--c, #fff);
+  border-radius: 12px;
+  font-size: 20px;
+  font-weight: 600;
+}
+.result-row .pts { font-size: 26px; font-weight: 800; }
